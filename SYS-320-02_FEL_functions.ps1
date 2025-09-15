@@ -1,6 +1,6 @@
 ﻿# Sys-320-02
 # Christopher Lavalette
-# Functions and Event Logs Script 1
+# Functions and Event Logs Script 1 and 2
 # 9/15/2025
 function Get-LogonLogoffEvents {
     param (
@@ -38,4 +38,32 @@ function Get-LogonLogoffEvents {
 }
 
 # Example usage of script:
-# Get-LogonLogoffEvents -Days 14
+# Get-LogonLogoffEvents -Days 3
+
+function Get-StartShutdownEvents {
+    param (
+        [int]$Days
+    )
+
+    # Get startup/shutdown events from the System log
+    $events = Get-EventLog -LogName System -After (Get-Date).AddDays(-$Days) |
+              Where-Object { $_.EventID -eq 6005 -or $_.EventID -eq 6006 }
+
+    $results = @()
+
+    foreach ($event in $events) {
+        $eventType = if ($event.EventID -eq 6005) { "Startup" } else { "Shutdown" }
+
+        $results += [PSCustomObject]@{
+            Time  = $event.TimeGenerated
+            Id    = $event.EventID
+            Event = $eventType
+            User  = "System"
+        }
+    }
+
+    return $results
+}
+
+# Example usage of script:
+# Get-StartShudownEvents -Days 7
