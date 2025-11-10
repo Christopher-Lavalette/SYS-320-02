@@ -1,0 +1,7 @@
+admin
+login
+wp
+sql
+config
+cmd
+etc/passwd
